@@ -18,8 +18,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Description TODO
@@ -29,6 +31,8 @@ import java.util.Properties;
 public class RDispatcherServlet extends HttpServlet {
 
     private Map<String, Object> mapping = new HashMap<>();
+
+    private Map<String, Object> UrlMapping = new HashMap<>();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -54,14 +58,20 @@ public class RDispatcherServlet extends HttpServlet {
 
             String scanPackage = configContext.getProperty("scanPackage");
             doScanner(scanPackage);
-            for (String className : mapping.keySet()) {
+            Iterator<Map.Entry<String, Object>> iterator = mapping.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<String, Object> entry = iterator.next();
+                String className = entry.getKey();
+                // // // }
+            // for (String className : mapping.keySet()) {
                 if (!className.contains(".")) {
                     continue;
                 }
                 Class<?> clazz = Class.forName(className);
 
                 if (clazz.isAnnotationPresent(RController.class)) {
-                    mapping.put(className, clazz.newInstance());
+                    entry.setValue(clazz.newInstance());
+                    // mapping.put(className, clazz.newInstance());
                     String baseUrl = "";
 
                     if (clazz.isAnnotationPresent(RRequestMapping.class)) {
@@ -76,7 +86,9 @@ public class RDispatcherServlet extends HttpServlet {
                         }
                         RRequestMapping requestMapping = method.getAnnotation(RRequestMapping.class);
                         String url = (baseUrl + "/" + requestMapping.value()).replaceAll("/+", "/");
-                        mapping.put(url, method);
+
+                        // entry.setValue(method);
+                        UrlMapping.put(url, method);
                         System.out.println("Mapped " + url + "," + method);
                     }
                 } else if (clazz.isAnnotationPresent(RService.class)) {
@@ -86,7 +98,8 @@ public class RDispatcherServlet extends HttpServlet {
                         beanName = clazz.getName();
                     }
                     Object instance = clazz.newInstance();
-                    mapping.put(beanName, instance);
+                    entry.setValue(instance);
+                    // mapping.put(beanName, instance);
                     for (Class<?> i : clazz.getInterfaces()) {
                         mapping.put(i.getName(), instance);
                     }
@@ -95,6 +108,9 @@ public class RDispatcherServlet extends HttpServlet {
                 }
             }
 
+            if (!UrlMapping.isEmpty()) {
+                mapping.putAll(UrlMapping);
+            }
 
 
             for (Object object : mapping.values()) {

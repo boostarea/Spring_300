@@ -16,12 +16,12 @@ import java.io.IOException;
  * @Date 2020/3/4 23:17
  **/
 @RController
-@RRequestMapping("demo")
+@RRequestMapping("/demo")
 public class DemoController {
     @RAutowired
     private DemoService demoService;
 
-    @RRequestMapping("query")
+    @RRequestMapping("/query")
     public void query(HttpServletRequest request, HttpServletResponse response, @RRequestParam("name") String name) throws IOException {
         String res = demoService.get(name);
         response.getWriter().write(res);

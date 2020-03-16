@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Description TODO
@@ -62,8 +61,6 @@ public class RDispatcherServlet extends HttpServlet {
             while (iterator.hasNext()) {
                 Map.Entry<String, Object> entry = iterator.next();
                 String className = entry.getKey();
-                // // // }
-            // for (String className : mapping.keySet()) {
                 if (!className.contains(".")) {
                     continue;
                 }

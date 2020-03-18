@@ -8,7 +8,7 @@
     <display-name>R Web Application</display-name>
     <servlet>
         <servlet-name>Rmvc</servlet-name>
-        <servlet-class>org.example.mvcFramework.v2.servlet.RDispatcherServlet_v2</servlet-class>
+        <servlet-class>org.example.mvcFramework.v3.servlet.RDispatcherServlet_v3</servlet-class>
         <init-param>
             <param-name>contextConfigLocation</param-name>
             <param-value>application.properties</param-value>
